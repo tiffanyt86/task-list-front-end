@@ -13,17 +13,6 @@ const Task = (props) => {
     props.onUpdateTask(updatedTask);
   };
 
-  const deleteButtonClick = () => {
-    console.log('in DELETE BUTTON CLICK!');
-    const taskDelete = {
-      key: props.id,
-      id: props.id,
-      title: props.title,
-      isComplete: props.isComplete,
-    };
-    props.onDelete(taskDelete);
-  };
-
   const buttonClass = props.isComplete ? 'tasks__item__toggle--completed' : '';
 
   return (
@@ -36,7 +25,7 @@ const Task = (props) => {
       </button>
       <button
         className="tasks__item__remove button"
-        onClick={() => deleteButtonClick()}
+        onClick={() => props.onDelete(props.id)}
       >
         x
       </button>

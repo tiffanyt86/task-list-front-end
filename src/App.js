@@ -13,6 +13,11 @@ const TASKS = [
     title: 'Cook Pasta',
     isComplete: true,
   },
+  {
+    id: 3,
+    title: 'Study React',
+    isComplete: false,
+  },
 ];
 
 const App = () => {
@@ -29,8 +34,8 @@ const App = () => {
     setTaskData(tasks);
   };
 
-  const deleteTask = (updatedTask) => {
-    const tasks = taskData.filter((task) => task.id !== updateTaskData.id);
+  const deleteTask = (id) => {
+    const tasks = taskData.filter((task) => task.id !== id);
     setTaskData(tasks);
   };
 
