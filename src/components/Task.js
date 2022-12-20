@@ -3,23 +3,13 @@ import React from 'react';
 import './Task.css';
 
 const Task = (props) => {
-  const completeTaskButtonClick = () => {
-    const updatedTask = {
-      key: props.id,
-      id: props.id,
-      title: props.title,
-      isComplete: !props.isComplete,
-    };
-    props.onUpdateTask(updatedTask);
-  };
-
   const buttonClass = props.isComplete ? 'tasks__item__toggle--completed' : '';
 
   return (
     <li className="tasks__item">
       <button
         className={`tasks__item__toggle ${buttonClass}`}
-        onClick={() => completeTaskButtonClick()}
+        onClick={() => props.onCompleteTaskButtonClick(props.id)}
       >
         {props.title}
       </button>
@@ -39,6 +29,7 @@ Task.propTypes = {
   isComplete: PropTypes.bool.isRequired,
   onUpdateTask: PropTypes.func.isRequired,
   onDelete: PropTypes.func,
+  onCompleteTaskButtonClick: PropTypes.func,
 };
 
 export default Task;

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TaskList from './components/TaskList.js';
 import './App.css';
+import axios from 'axios';
 
 const TASKS = [
   {
@@ -34,10 +35,36 @@ const App = () => {
     setTaskData(tasks);
   };
 
+  const completeTaskButtonClick = (id) => {
+    const updatedTask = taskData.map((task) => {
+      if (task.id === id) {
+        return { ...task, isComplete: !task.isComplete };
+      }
+      return task;
+    });
+    setTaskData(updatedTask);
+  };
+
   const deleteTask = (id) => {
     const tasks = taskData.filter((task) => task.id !== id);
     setTaskData(tasks);
   };
+
+  const getAllTasks = () => {
+    axios
+      .get('https://task-list-api-c17.herokuapp.com/tasks')
+      .then((response) => {
+        setTaskData(response.data);
+      })
+      .catch((error) => {
+        console.error(error.response.data.message);
+      });
+  };
+
+  useEffect(() => {
+    console.log('in useEffect!');
+    getAllTasks();
+  }, []);
 
   return (
     <div className="App">
@@ -50,6 +77,7 @@ const App = () => {
             <TaskList
               tasks={taskData}
               onUpdateTask={updateTaskData}
+              onCompleteTaskButtonClick={completeTaskButtonClick}
               onDelete={deleteTask}
             />
           }
