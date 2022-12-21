@@ -12,8 +12,7 @@ const TaskList = (props) => {
           id={task.id}
           title={task.title}
           isComplete={task.isComplete}
-          onCompleteTaskButtonClick={props.onCompleteTaskButtonClick}
-          onUpdateTask={props.onUpdateTask}
+          onCompleteTask={props.onCompleteTask}
           onDelete={props.onDelete}
         />
       );
@@ -31,9 +30,8 @@ TaskList.propTypes = {
       isComplete: PropTypes.bool.isRequired,
     })
   ).isRequired,
-  onUpdateTask: PropTypes.func.isRequired,
-  onDelete: PropTypes.func,
-  onCompleteTaskButtonClick: PropTypes.func,
+  onDelete: PropTypes.func.isRequired,
+  onCompleteTask: PropTypes.func.isRequired,
 };
 
 export default TaskList;

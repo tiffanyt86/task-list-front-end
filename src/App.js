@@ -3,6 +3,45 @@ import TaskList from './components/TaskList.js';
 import './App.css';
 import axios from 'axios';
 
+// HELPER FUNCTIONS
+
+const baseURL = 'https://task-list-api-c17.herokuapp.com';
+
+const convertTask = (task) => {
+  const { id, is_complete: isComplete, title } = task;
+  return { id, isComplete, title };
+};
+
+const getAllTasksAPI = () => {
+  return axios
+    .get(`${baseURL}/tasks`)
+    .then((response) => {
+      return response.data.map(convertTask);
+    })
+    .catch((error) => {
+      console.error(error.response.data.message);
+    });
+};
+
+const updateTasksAPI = (id, isComplete) => {
+  const endpoint = isComplete ? 'mark_complete' : 'mark_incomplete';
+
+  return axios
+    .patch(`${baseURL}/tasks/${id}/${endpoint}`)
+    .then((response) => {
+      return convertTask(response.data.task);
+    })
+    .catch((error) => {
+      console.error(error.response.data.message);
+    });
+};
+
+const deleteTaskAPI = (id) => {
+  return axios.delete(`${baseURL}/tasks/${id}`).catch((error) => {
+    console.error(error.response.data.message);
+  });
+};
+
 const TASKS = [
   {
     id: 1,
@@ -21,49 +60,57 @@ const TASKS = [
   },
 ];
 
+// START OF APP COMPONENT
+
 const App = () => {
   const [taskData, setTaskData] = useState(TASKS);
 
-  const updateTaskData = (updatedTask) => {
-    const tasks = taskData.map((task) => {
-      if (task.id === updatedTask.id) {
-        return updatedTask;
-      } else {
-        return task;
-      }
-    });
-    setTaskData(tasks);
+  const updateTasks = () => {
+    return getAllTasksAPI()
+      .then((tasks) => {
+        setTaskData(tasks);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   };
 
-  const completeTaskButtonClick = (id) => {
-    const updatedTask = taskData.map((task) => {
-      if (task.id === id) {
-        return { ...task, isComplete: !task.isComplete };
-      }
-      return task;
-    });
-    setTaskData(updatedTask);
+  const toggleCompleteTask = (id) => {
+    const task = taskData.find((task) => task.id === id);
+    if (!task) {
+      return Promise.resolve();
+    }
+    return updateTasksAPI(id, !task.isComplete)
+      .then((newTask) => {
+        setTaskData((oldTask) => {
+          return oldTask.map((task) => {
+            if (task.id === newTask.id) {
+              return newTask;
+            }
+            return task;
+          });
+        });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   };
 
   const deleteTask = (id) => {
-    const tasks = taskData.filter((task) => task.id !== id);
-    setTaskData(tasks);
-  };
-
-  const getAllTasks = () => {
-    axios
-      .get('https://task-list-api-c17.herokuapp.com/tasks')
-      .then((response) => {
-        setTaskData(response.data);
+    return deleteTaskAPI(id)
+      .then(() => {
+        setTaskData((oldTasks) => {
+          return oldTasks.filter((task) => task.id !== id);
+        });
       })
-      .catch((error) => {
-        console.error(error.response.data.message);
+      .catch((err) => {
+        console.log(err.message);
       });
   };
 
   useEffect(() => {
     console.log('in useEffect!');
-    getAllTasks();
+    updateTasks();
   }, []);
 
   return (
@@ -76,8 +123,7 @@ const App = () => {
           {
             <TaskList
               tasks={taskData}
-              onUpdateTask={updateTaskData}
-              onCompleteTaskButtonClick={completeTaskButtonClick}
+              onCompleteTask={toggleCompleteTask}
               onDelete={deleteTask}
             />
           }
