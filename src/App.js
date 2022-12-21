@@ -1,72 +1,77 @@
 import React, { useState, useEffect } from 'react';
-import TaskList from './components/TaskList.js';
-import './App.css';
 import axios from 'axios';
+import TaskList from './components/TaskList.js';
+import NewTaskForm from './components/NewTaskForm.js';
+
+import './App.css';
 
 // HELPER FUNCTIONS
 
-const baseURL = 'https://task-list-api-c17.herokuapp.com';
+// const kBaseUrl = 'https://task-list-api-c17.herokuapp.com';
+const kBaseUrl = 'http://127.0.0.1:5000';
 
-const convertTask = (task) => {
-  const { id, is_complete: isComplete, title } = task;
-  return { id, isComplete, title };
+const convertTaskApi = (task) => {
+  const { id, is_complete: isComplete, title, description } = task;
+  return { id, isComplete, title, description };
 };
 
-const getAllTasksAPI = () => {
+const getAllTasksApi = () => {
   return axios
-    .get(`${baseURL}/tasks`)
+    .get(`${kBaseUrl}/tasks`)
     .then((response) => {
-      return response.data.map(convertTask);
+      return response.data.map(convertTaskApi);
     })
     .catch((error) => {
-      console.error(error.response.data.message);
+      console.log(error.response.data.message);
     });
 };
 
-const updateTasksAPI = (id, isComplete) => {
+const updateTasksApi = (id, isComplete) => {
   const endpoint = isComplete ? 'mark_complete' : 'mark_incomplete';
 
   return axios
-    .patch(`${baseURL}/tasks/${id}/${endpoint}`)
+    .patch(`${kBaseUrl}/tasks/${id}/${endpoint}`)
     .then((response) => {
-      return convertTask(response.data.task);
+      return convertTaskApi(response.data.task);
     })
     .catch((error) => {
-      console.error(error.response.data.message);
+      console.log(error.response.data.message);
     });
 };
 
-const deleteTaskAPI = (id) => {
-  return axios.delete(`${baseURL}/tasks/${id}`).catch((error) => {
-    console.error(error.response.data.message);
+const deleteTaskApi = (id) => {
+  return axios.delete(`${kBaseUrl}/tasks/${id}`).catch((error) => {
+    console.log(error.response.data.message);
   });
 };
 
-const TASKS = [
-  {
-    id: 1,
-    title: 'Mow the lawn',
-    isComplete: false,
-  },
-  {
-    id: 2,
-    title: 'Cook Pasta',
-    isComplete: true,
-  },
-  {
-    id: 3,
-    title: 'Study React',
-    isComplete: false,
-  },
-];
+const addTaskApi = (title, description) => {
+  const newTask = {
+    title: title,
+    description: description,
+  };
+  return axios
+    .post(`${kBaseUrl}/tasks`, newTask)
+    .then((response) => {
+      return convertTaskApi(response.data.task);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
 
 // START OF APP COMPONENT
 
 const App = () => {
-  const [taskData, setTaskData] = useState(TASKS);
+  const [taskData, setTaskData] = useState([]);
+
+  useEffect(() => {
+    // console.log('in useEffect!');
+    updateTasks();
+  }, []);
 
   const updateTasks = () => {
-    return getAllTasksAPI()
+    return getAllTasksApi()
       .then((tasks) => {
         setTaskData(tasks);
       })
@@ -80,7 +85,7 @@ const App = () => {
     if (!task) {
       return Promise.resolve();
     }
-    return updateTasksAPI(id, !task.isComplete)
+    return updateTasksApi(id, !task.isComplete)
       .then((newTask) => {
         setTaskData((oldTask) => {
           return oldTask.map((task) => {
@@ -97,21 +102,26 @@ const App = () => {
   };
 
   const deleteTask = (id) => {
-    return deleteTaskAPI(id)
+    return deleteTaskApi(id)
       .then(() => {
         setTaskData((oldTasks) => {
           return oldTasks.filter((task) => task.id !== id);
         });
       })
-      .catch((err) => {
-        console.log(err.message);
+      .catch((error) => {
+        console.log(error.message);
       });
   };
 
-  useEffect(() => {
-    console.log('in useEffect!');
-    updateTasks();
-  }, []);
+  const addTask = (title, description) => {
+    return addTaskApi(title, description)
+      .then((newTask) => {
+        setTaskData([...taskData, newTask]);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
 
   return (
     <div className="App">
@@ -127,6 +137,7 @@ const App = () => {
               onDelete={deleteTask}
             />
           }
+          <NewTaskForm onAddTask={addTask} />
         </div>
       </main>
     </div>

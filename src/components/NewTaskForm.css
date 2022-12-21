@@ -1,0 +1,8 @@
+.formContainer {
+    text-align: center;
+}
+
+form {
+    width: 50%;
+    display: inline-block;
+}
