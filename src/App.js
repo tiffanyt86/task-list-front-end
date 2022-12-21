@@ -82,9 +82,9 @@ const App = () => {
 
   const toggleCompleteTask = (id) => {
     const task = taskData.find((task) => task.id === id);
-    if (!task) {
-      return Promise.resolve();
-    }
+    // if (!task) {
+    //   return Promise.resolve();
+    // }
     return updateTasksApi(id, !task.isComplete)
       .then((newTask) => {
         setTaskData((oldTask) => {
