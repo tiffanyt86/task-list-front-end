@@ -2,34 +2,27 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import './NewTaskForm.css';
 
+const kDefaultFormState = {
+  title: '',
+  description: '',
+};
+
 const NewTaskForm = (props) => {
-  const [formField, setformField] = useState({
-    title: '',
-    description: '',
-  });
+  const [formField, setformField] = useState(kDefaultFormState);
 
-  const onTitleChange = (event) => {
-    setformField({
-      ...formField,
-      title: event.target.value,
-    });
-  };
+  const handleChange = (event) => {
+    const fieldValue = event.target.value;
+    const fieldName = event.target.name;
+    const newFormData = { ...formField, [fieldName]: fieldValue };
 
-  const onDescriptionChange = (event) => {
-    setformField({
-      ...formField,
-      description: event.target.value,
-    });
+    setformField(newFormData);
   };
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
 
-    props.onAddTask(formField.title, formField.description);
-    setformField({
-      title: '',
-      description: '',
-    });
+    props.onAddTask(formField);
+    setformField(kDefaultFormState);
   };
 
   return (
@@ -39,18 +32,20 @@ const NewTaskForm = (props) => {
           <label htmlFor="title">Title</label>
           <input
             type="text"
+            id="title"
             name="title"
             value={formField.title}
-            onChange={onTitleChange}
+            onChange={handleChange}
           ></input>
         </div>
         <div>
           <label htmlFor="description">Description</label>
           <input
             type="text"
+            id="description"
             name="description"
             value={formField.description}
-            onChange={onDescriptionChange}
+            onChange={handleChange}
           ></input>
         </div>
         <input type="submit" value="Add New Task"></input>

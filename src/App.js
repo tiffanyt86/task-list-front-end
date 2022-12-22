@@ -7,8 +7,8 @@ import './App.css';
 
 // HELPER FUNCTIONS
 
-// const kBaseUrl = 'https://task-list-api-c17.herokuapp.com';
-const kBaseUrl = 'http://127.0.0.1:5000';
+const kBaseUrl = 'https://task-list-api-c17.herokuapp.com';
+// const kBaseUrl = 'http://127.0.0.1:5000';
 
 const convertTaskApi = (task) => {
   const { id, is_complete: isComplete, title, description } = task;
@@ -45,11 +45,8 @@ const deleteTaskApi = (id) => {
   });
 };
 
-const addTaskApi = (title, description) => {
-  const newTask = {
-    title: title,
-    description: description,
-  };
+const addTaskApi = (taskData) => {
+  const newTask = { ...taskData };
   return axios
     .post(`${kBaseUrl}/tasks`, newTask)
     .then((response) => {
@@ -66,7 +63,6 @@ const App = () => {
   const [taskData, setTaskData] = useState([]);
 
   useEffect(() => {
-    // console.log('in useEffect!');
     updateTasks();
   }, []);
 
